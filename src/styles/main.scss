@@ -3,11 +3,25 @@ $button-color: #7ca7d8;
 * {
   margin: 0;
   padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .main-heading {
   text-align: center;
   margin-top: 12px;
+}
+
+.github-tag {
+  background-color: black;
+  display: flex;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  border-radius: 5px;
+
+  &__icon {
+    width: 60px;
+  }
 }
 
 .controls {
@@ -57,6 +71,27 @@ $button-color: #7ca7d8;
 
     &:not(:first-child) {
       margin-left: 4px;
+    }
+  }
+}
+
+.description {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 48px;
+
+  h2 {
+    margin-top: 36px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 14pt;
+
+    &:not(:last-child) {
+      margin-bottom: 8px;
     }
   }
 }
