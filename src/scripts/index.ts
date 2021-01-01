@@ -4,20 +4,26 @@ let blocks: HTMLDivElement[] = [];
 let running = false;
 
 function setUp(): void {
+  const existingBlocksString = localStorage.getItem('blocks');
+  const existingBlocks = existingBlocksString ? JSON.parse(existingBlocksString) as number[] : [];
   for (let i = 0; i < 25; i++) {
     const blockDiv = document.createElement('div');
     blockDiv.className = 'block';
-    blockDiv.innerHTML = '0';
-    blockDiv.style.backgroundColor = 'rgb(0, 0, 0)';
+    let num: number;
+    num = existingBlocks.length > 0 ? existingBlocks[i] : 0;
+    blockDiv.innerHTML = num + '';
+    blockDiv.style.backgroundColor = getColor(num);
     blocks.push(blockDiv);
     blocksContainer.appendChild(blockDiv);
   }
 
+  updateLocalStorage();
   toggleButton.addEventListener('click', toggle);
   document.querySelector('#reset')!.addEventListener('click', reset);
 }
 
 function reset(): void {
+  localStorage.removeItem('blocks');
   blocks = [];
   blocksContainer.innerHTML = '';
   setUp();
@@ -41,6 +47,7 @@ async function toggle(): Promise<void> {
   running = !running;
   while (running) {
     await delay(modifyRandomBlock);
+    updateLocalStorage();
   }
 }
 
@@ -52,22 +59,26 @@ async function modifyRandomBlock(): Promise<void> {
   const currentNum = parseInt(block.innerHTML);
   const nextNum = currentNum + mutator;
   
-  let backgroundColorStyle: string;
-  if (nextNum < 0) {
-    backgroundColorStyle = `rgb(0, 0, ${-3 * nextNum})`;
-  } else if (nextNum > 0) {
-    backgroundColorStyle = `rgb(${nextNum * 3}, 0, 0)`;
-  } else {
-    backgroundColorStyle = 'rgb(0, 0, 0)';
-  }
   block.innerHTML = nextNum + '';
-  block.style.backgroundColor = backgroundColorStyle;
+  block.style.backgroundColor = getColor(nextNum);
 
   if (mutator < 0) {
     await bubbleUp(index);
   } else if (mutator > 0) {
     await bubbleDown(index);
   }
+}
+
+function getColor(num: number): string {
+  let backgroundColorStyle: string;
+  if (num < 0) {
+    backgroundColorStyle = `rgb(0, 0, ${-3 * num})`;
+  } else if (num > 0) {
+    backgroundColorStyle = `rgb(${num * 3}, 0, 0)`;
+  } else {
+    backgroundColorStyle = 'rgb(0, 0, 0)';
+  }
+  return backgroundColorStyle;
 }
 
 async function bubbleUp(index: number): Promise<void> {
@@ -120,6 +131,10 @@ async function bubbleDown(index: number): Promise<void> {
       keepBubbling = false;
     }
   }
+}
+
+function updateLocalStorage(): void {
+  localStorage.setItem('blocks', JSON.stringify(blocks.map(block => parseInt(block.innerHTML))));
 }
 
 setUp();
